@@ -1,10 +1,22 @@
-import { Box, Grid,HStack, VStack} from "@chakra-ui/react";
+import { Box, Grid,HStack, Image, Text, VStack} from "@chakra-ui/react";
 import CarouselSlick from "../components/CarouselSlick";
 import CardItem from "../components/CardItem";
-
 import TitleImageSkew from "../components/TitleImageSkew";
+import { useQuery } from "react-query";
+import Slider from "react-slick";
+import { Link } from "react-router-dom";
 
 export default function Home() {
+
+  const settings = {
+    dots:false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 7,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 2500,
+  };
 
   const featuresLists = [
     {title:"스마트웹앱 3기",
@@ -20,6 +32,14 @@ export default function Home() {
      buttonText: "자세히 보기"
     }
   ]
+
+  const { isLoading, error, data } = useQuery('repoData', () =>
+    fetch('https://gateway.marvel.com:443/v1/public/comics?apikey=8de17f456fd399a88335f1172f37bb59').then(res =>
+      res.json()
+    )
+  )
+
+  console.log(data, isLoading, error)
 
   return (
     <>
@@ -50,7 +70,26 @@ export default function Home() {
       {/* Comics 컨텐츠 리스트 */}
       <VStack w="full" position="relative" h="400px">
         {/* 한박스 위로 올라오게 하는 범위지정 */}
-        <Box position="absolute" w="7xl" h="400px" top="-16" bg="white"></Box>
+        <Box position="absolute" w="7xl" h="420px" top="-16" bg="white" py="8" px="2">
+          <Slider {...settings}>
+            {data?.data?.results?.map((item, i)=>(
+              <Link to={`/comics/${item.id}`} key={i}>
+                <VStack  h="full" role="group" cursor="pointer" >
+                  <Box w="170px" h="240px" 
+                      _groupHover={{transform: "scale(1.1)"}} transition={"0.4s"} 
+                      overflow="hidden">
+                    <Image 
+                        w="full" h="full" objectFit="cover"
+                        src={`${item.thumbnail.path}.${item.thumbnail.extension}`} alt={`Comics ${i}`}/>
+                  </Box>
+                  <Text px="2" mt="2" 
+                      _groupHover={{color: "red.500", fontWeight: "600"}} 
+                      transition={"0.4s"}>{item.title.substr(0,36)}</Text>
+                </VStack>
+              </Link>
+            ))}
+          </Slider>
+        </Box>
       </VStack>
     </>
   );
