@@ -9,10 +9,12 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { BsFillMoonFill, BsFillSunFill } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Header() {
   const [scroll, setScroll] = useState(true);
+
+
   useEffect(() => {
     document.addEventListener("wheel", (event) => {
       if (event.deltaY < 0) {
@@ -32,6 +34,8 @@ export default function Header() {
     { title: "events", href: "/events" },
   ];
   const { colorMode, toggleColorMode } = useColorMode();
+  const apple = useLocation()
+  console.log(apple.pathname)
 
   return (
     <Stack
@@ -60,7 +64,7 @@ export default function Header() {
           <HStack textTransform="uppercase" spacing="4">
             {GNB.map((item) => (
               <Link to={item.href} key={item.title} aria-label={item.title}>
-                <Text>{item.title}</Text>
+                <Text color={item.href === apple.pathname && "red.500" }>{item.title}</Text>
               </Link>
             ))}
           </HStack>
